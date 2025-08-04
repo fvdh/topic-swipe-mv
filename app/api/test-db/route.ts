@@ -25,6 +25,7 @@ export async function GET(request: NextRequest) {
         },
         { status: 500 },
       )
+      
     }
 
     if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
