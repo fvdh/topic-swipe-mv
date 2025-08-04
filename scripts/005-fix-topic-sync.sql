@@ -1,5 +1,7 @@
 -- Clean up any existing topics and ensure proper UUIDs
 -- This script ensures topics match the frontend exactly
+-- Ensure we're not in a read-only transaction
+BEGIN;
 
 -- First, clear existing data to avoid conflicts
 DELETE FROM user_topic_preferences;
@@ -153,6 +155,9 @@ INSERT INTO topics (id, title, description, category, image_url, icon, is_active
 ('550e8400-e29b-41d4-a716-446655440113', 'Crunchy peanut butter is superior', 'Texture adds to the eating experience', 'conversation', '/placeholder.svg?height=600&width=400&text=Crunchy+Peanut+Butter', '🥜', true),
 ('550e8400-e29b-41d4-a716-446655440114', 'Winter holidays are too commercialized', 'Authentic celebration gets lost in marketing', 'conversation', '/placeholder.svg?height=600&width=400&text=Holiday+Commercial', '🎄', true),
 ('550e8400-e29b-41d4-a716-446655440115', 'Parallel parking should be optional', 'Modern cars should eliminate this requirement', 'conversation', '/placeholder.svg?height=600&width=400&text=Parallel+Parking', '🚗', true);
+
+-- Commit the transaction
+COMMIT;
 
 -- Verify the insert worked
 SELECT COUNT(*) as total_topics FROM topics;

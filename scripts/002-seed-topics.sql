@@ -1,4 +1,7 @@
 -- Insert conversation starter topics with proper UUIDs
+-- Ensure we're not in a read-only transaction
+BEGIN;
+
 INSERT INTO topics (id, title, description, category, image_url, icon) VALUES
 -- Conversation Starters
 ('550e8400-e29b-41d4-a716-446655440021', 'Pineapple belongs on pizza', 'The sweet and savory combination is perfect', 'conversation', '/placeholder.svg?height=600&width=400&text=Pineapple+Pizza', '🍕'),
@@ -148,3 +151,6 @@ INSERT INTO topics (id, title, description, category, image_url, icon) VALUES
 ('550e8400-e29b-41d4-a716-446655440115', 'Parallel parking should be optional', 'Modern cars should eliminate this requirement', 'conversation', '/placeholder.svg?height=600&width=400&text=Parallel+Parking', '🚗')
 
 ON CONFLICT (id) DO NOTHING;
+
+-- Commit the transaction
+COMMIT;

@@ -28,13 +28,19 @@ export function TopicSync() {
       setIsLoading(true)
       setError("")
 
+      console.log("Checking sync status...")
+
       const response = await fetch("/api/topics/sync")
       const data = await response.json()
 
+      console.log("Status response:", data)
+
       if (!response.ok) {
+        console.error("Status check failed with status:", response.status)
         throw new Error(data.error || "Failed to check sync status")
       }
 
+      console.log("Status check successful:", data)
       setSyncStatus(data)
     } catch (error: any) {
       console.error("Sync status check error:", error)
@@ -49,6 +55,8 @@ export function TopicSync() {
       setIsLoading(true)
       setError("")
 
+      console.log("Starting topic sync...")
+
       const response = await fetch("/api/topics/sync", {
         method: "POST",
         headers: {
@@ -57,11 +65,14 @@ export function TopicSync() {
       })
 
       const data = await response.json()
+      console.log("Sync response:", data)
 
       if (!response.ok) {
+        console.error("Sync failed with status:", response.status)
         throw new Error(data.error || "Failed to sync topics")
       }
 
+      console.log("Sync successful:", data)
       setLastSyncTime(new Date().toLocaleString())
       await checkSyncStatus() // Refresh status
     } catch (error: any) {
@@ -194,6 +205,20 @@ export function TopicSync() {
             <li>• Required before users can swipe and save preferences</li>
           </ul>
         </div>
+
+        {error && error.includes("environment variable") && (
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+            <h4 className="font-semibold text-amber-800 mb-2">Environment Setup Required</h4>
+            <div className="text-sm text-amber-700 space-y-2">
+              <p>To use the sync functionality, you need to configure Supabase environment variables:</p>
+              <ul className="list-disc list-inside space-y-1">
+                <li>Create a <code className="bg-amber-100 px-1 rounded">.env.local</code> file in your project root</li>
+                <li>Add your Supabase project URL and keys</li>
+                <li>See <code className="bg-amber-100 px-1 rounded">.env.local.example</code> for the format</li>
+              </ul>
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   )
