@@ -8,6 +8,7 @@ import { AlertCircle, CheckCircle, Database, Loader2, Copy, ExternalLink } from 
 
 import { TopicSync } from "./topic-sync"
 import { EnvironmentSetup } from "./environment-setup"
+import MatchingDebugger from "../matching-debugger"
 
 const SQL_SCRIPTS = {
   "001-create-tables": `-- Enable necessary extensions
@@ -558,6 +559,7 @@ export function DatabaseSetup() {
             </div>
 
             <TopicSync />
+            <MatchingDebugger />
           </div>
         )}
 
