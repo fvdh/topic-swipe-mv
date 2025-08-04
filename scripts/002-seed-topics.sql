@@ -43,6 +43,108 @@ INSERT INTO topics (id, title, description, category, image_url, icon) VALUES
 ('550e8400-e29b-41d4-a716-446655440017', 'Exercise should be mandatory in schools', 'Physical activity is essential for child development', 'health', '/placeholder.svg?height=600&width=400&text=School+Exercise', '🏃'),
 ('550e8400-e29b-41d4-a716-446655440018', 'Sugar should be regulated like tobacco', 'Excessive sugar consumption causes serious health issues', 'health', '/placeholder.svg?height=600&width=400&text=Sugar+Regulation', '🍭'),
 ('550e8400-e29b-41d4-a716-446655440019', 'Alternative medicine has real benefits', 'Traditional healing methods complement modern medicine', 'health', '/placeholder.svg?height=600&width=400&text=Alternative+Medicine', '🌿'),
-('550e8400-e29b-41d4-a716-446655440020', 'Sleep is more important than diet', 'Quality rest is the foundation of good health', 'health', '/placeholder.svg?height=600&width=400&text=Sleep+Health', '😴')
+('550e8400-e29b-41d4-a716-446655440020', 'Sleep is more important than diet', 'Quality rest is the foundation of good health', 'health', '/placeholder.svg?height=600&width=400&text=Sleep+Health', '😴'),
+
+-- More Nature & Environment
+('550e8400-e29b-41d4-a716-446655440036', 'Nuclear energy is essential for climate goals', 'Clean nuclear power is necessary to reduce emissions', 'nature', '/placeholder.svg?height=600&width=400&text=Nuclear+Energy', '⚛️'),
+('550e8400-e29b-41d4-a716-446655440037', 'Ocean cleanup should be a global priority', 'Marine pollution threatens entire ecosystems', 'nature', '/placeholder.svg?height=600&width=400&text=Ocean+Cleanup', '🌊'),
+('550e8400-e29b-41d4-a716-446655440038', 'Vertical farming will revolutionize agriculture', 'Indoor farming uses less water and land', 'nature', '/placeholder.svg?height=600&width=400&text=Vertical+Farming', '🌾'),
+('550e8400-e29b-41d4-a716-446655440039', 'Meat alternatives taste just as good', 'Plant-based proteins can replace traditional meat', 'nature', '/placeholder.svg?height=600&width=400&text=Meat+Alternatives', '🥩'),
+('550e8400-e29b-41d4-a716-446655440040', 'National parks should be expanded', 'Protected areas preserve biodiversity', 'nature', '/placeholder.svg?height=600&width=400&text=National+Parks', '🏞️'),
+('550e8400-e29b-41d4-a716-446655440041', 'Urban beekeeping helps pollinators', 'City bees support local ecosystems', 'nature', '/placeholder.svg?height=600&width=400&text=Urban+Beekeeping', '🐝'),
+('550e8400-e29b-41d4-a716-446655440042', 'Reforestation can reverse climate change', 'Planting trees captures carbon effectively', 'nature', '/placeholder.svg?height=600&width=400&text=Reforestation', '🌳'),
+
+-- More Technology & Innovation
+('550e8400-e29b-41d4-a716-446655440043', 'Quantum computing will change everything', 'Quantum computers will solve impossible problems', 'technology', '/placeholder.svg?height=600&width=400&text=Quantum+Computing', '🔬'),
+('550e8400-e29b-41d4-a716-446655440044', 'Self-driving cars are safer than humans', 'Autonomous vehicles reduce traffic accidents', 'technology', '/placeholder.svg?height=600&width=400&text=Self+Driving+Cars', '🚗'),
+('550e8400-e29b-41d4-a716-446655440045', 'VR will replace traditional entertainment', 'Virtual reality offers immersive experiences', 'technology', '/placeholder.svg?height=600&width=400&text=Virtual+Reality', '🥽'),
+('550e8400-e29b-41d4-a716-446655440046', '5G networks are essential infrastructure', 'Fast connectivity enables innovation', 'technology', '/placeholder.svg?height=600&width=400&text=5G+Networks', '📶'),
+('550e8400-e29b-41d4-a716-446655440047', 'Robots will be household companions', 'AI assistants will help with daily tasks', 'technology', '/placeholder.svg?height=600&width=400&text=Household+Robots', '🤖'),
+('550e8400-e29b-41d4-a716-446655440048', 'Blockchain beyond cryptocurrency matters', 'Distributed ledgers have many applications', 'technology', '/placeholder.svg?height=600&width=400&text=Blockchain', '⛓️'),
+('550e8400-e29b-41d4-a716-446655440049', 'Gene editing will cure diseases', 'CRISPR technology offers medical breakthroughs', 'technology', '/placeholder.svg?height=600&width=400&text=Gene+Editing', '🧬'),
+('550e8400-e29b-41d4-a716-446655440050', '3D printing will revolutionize manufacturing', 'Additive manufacturing enables customization', 'technology', '/placeholder.svg?height=600&width=400&text=3D+Printing', '🖨️'),
+
+-- More Lifestyle & Society
+('550e8400-e29b-41d4-a716-446655440051', 'Minimalism leads to happiness', 'Owning less creates more freedom', 'lifestyle', '/placeholder.svg?height=600&width=400&text=Minimalism', '✨'),
+('550e8400-e29b-41d4-a716-446655440052', 'Tiny houses are the future of living', 'Small homes reduce environmental impact', 'lifestyle', '/placeholder.svg?height=600&width=400&text=Tiny+Houses', '🏠'),
+('550e8400-e29b-41d4-a716-446655440053', 'Public transportation beats private cars', 'Mass transit is more efficient and sustainable', 'lifestyle', '/placeholder.svg?height=600&width=400&text=Public+Transport', '🚇'),
+('550e8400-e29b-41d4-a716-446655440054', 'Digital nomadism is overrated', 'Constant travel lacks stability and community', 'lifestyle', '/placeholder.svg?height=600&width=400&text=Digital+Nomad', '💻'),
+('550e8400-e29b-41d4-a716-446655440055', 'Fashion should prioritize sustainability', 'Fast fashion harms workers and environment', 'lifestyle', '/placeholder.svg?height=600&width=400&text=Sustainable+Fashion', '👗'),
+('550e8400-e29b-41d4-a716-446655440056', 'Urban gardens improve communities', 'Community gardens build social connections', 'lifestyle', '/placeholder.svg?height=600&width=400&text=Urban+Gardens', '🌻'),
+('550e8400-e29b-41d4-a716-446655440057', 'Subscription services are wasteful', 'Too many subscriptions create unnecessary spending', 'lifestyle', '/placeholder.svg?height=600&width=400&text=Subscriptions', '💳'),
+
+-- More Health & Wellness
+('550e8400-e29b-41d4-a716-446655440058', 'Cold showers boost immunity', 'Regular cold exposure strengthens the body', 'health', '/placeholder.svg?height=600&width=400&text=Cold+Showers', '🚿'),
+('550e8400-e29b-41d4-a716-446655440059', 'Meditation should be taught in schools', 'Mindfulness improves focus and emotional regulation', 'health', '/placeholder.svg?height=600&width=400&text=School+Meditation', '🧘'),
+('550e8400-e29b-41d4-a716-446655440060', 'Intermittent fasting is beneficial', 'Time-restricted eating improves metabolism', 'health', '/placeholder.svg?height=600&width=400&text=Intermittent+Fasting', '⏰'),
+('550e8400-e29b-41d4-a716-446655440061', 'Vitamin supplements are unnecessary', 'Whole foods provide better nutrition', 'health', '/placeholder.svg?height=600&width=400&text=Vitamin+Supplements', '💊'),
+('550e8400-e29b-41d4-a716-446655440062', 'Walking is the best exercise', 'Simple walking provides excellent health benefits', 'health', '/placeholder.svg?height=600&width=400&text=Walking+Exercise', '🚶'),
+('550e8400-e29b-41d4-a716-446655440063', 'Therapy should be normalized', 'Mental health support should be routine care', 'health', '/placeholder.svg?height=600&width=400&text=Therapy+Normal', '💭'),
+('550e8400-e29b-41d4-a716-446655440064', 'Dental health affects overall health', 'Oral hygiene impacts whole-body wellness', 'health', '/placeholder.svg?height=600&width=400&text=Dental+Health', '🦷'),
+
+-- Food & Culinary
+('550e8400-e29b-41d4-a716-446655440065', 'Spicy food improves health', 'Hot peppers boost metabolism and immunity', 'food', '/placeholder.svg?height=600&width=400&text=Spicy+Food', '🌶️'),
+('550e8400-e29b-41d4-a716-446655440066', 'Fermented foods are superfoods', 'Pickled vegetables support gut health', 'food', '/placeholder.svg?height=600&width=400&text=Fermented+Foods', '🥒'),
+('550e8400-e29b-41d4-a716-446655440067', 'Food trucks serve better food than restaurants', 'Street food offers authentic flavors', 'food', '/placeholder.svg?height=600&width=400&text=Food+Trucks', '🚚'),
+('550e8400-e29b-41d4-a716-446655440068', 'Cooking with cast iron is superior', 'Iron cookware improves food taste and nutrition', 'food', '/placeholder.svg?height=600&width=400&text=Cast+Iron', '🍳'),
+('550e8400-e29b-41d4-a716-446655440069', 'Local farmers markets are essential', 'Direct-from-farm produce supports communities', 'food', '/placeholder.svg?height=600&width=400&text=Farmers+Market', '🥕'),
+('550e8400-e29b-41d4-a716-446655440070', 'Meal prep saves time and money', 'Planning meals ahead reduces waste', 'food', '/placeholder.svg?height=600&width=400&text=Meal+Prep', '📦'),
+('550e8400-e29b-41d4-a716-446655440071', 'Sourdough bread is worth the effort', 'Naturally fermented bread tastes better', 'food', '/placeholder.svg?height=600&width=400&text=Sourdough+Bread', '🍞'),
+('550e8400-e29b-41d4-a716-446655440072', 'Organic food is worth the cost', 'Pesticide-free produce is healthier', 'food', '/placeholder.svg?height=600&width=400&text=Organic+Food', '🥬'),
+
+-- Entertainment & Arts
+('550e8400-e29b-41d4-a716-446655440073', 'Live music beats recorded music', 'Concert experiences are irreplaceable', 'entertainment', '/placeholder.svg?height=600&width=400&text=Live+Music', '🎤'),
+('550e8400-e29b-41d4-a716-446655440074', 'Indie films are better than blockbusters', 'Independent cinema offers more creativity', 'entertainment', '/placeholder.svg?height=600&width=400&text=Indie+Films', '🎬'),
+('550e8400-e29b-41d4-a716-446655440075', 'Podcasts are the new radio', 'On-demand audio content is more engaging', 'entertainment', '/placeholder.svg?height=600&width=400&text=Podcasts', '🎧'),
+('550e8400-e29b-41d4-a716-446655440076', 'Theater should be more accessible', 'Live performances need broader audiences', 'entertainment', '/placeholder.svg?height=600&width=400&text=Theater+Access', '🎭'),
+('550e8400-e29b-41d4-a716-446655440077', 'Museums should be free for everyone', 'Art and culture should be publicly accessible', 'entertainment', '/placeholder.svg?height=600&width=400&text=Free+Museums', '🏛️'),
+('550e8400-e29b-41d4-a716-446655440078', 'Stand-up comedy is therapeutic', 'Laughter provides mental health benefits', 'entertainment', '/placeholder.svg?height=600&width=400&text=Stand+Up+Comedy', '😂'),
+('550e8400-e29b-41d4-a716-446655440079', 'Art therapy should be mainstream', 'Creative expression helps heal trauma', 'entertainment', '/placeholder.svg?height=600&width=400&text=Art+Therapy', '🎨'),
+('550e8400-e29b-41d4-a716-446655440080', 'Street art is legitimate art', 'Graffiti and murals deserve recognition', 'entertainment', '/placeholder.svg?height=600&width=400&text=Street+Art', '🎨'),
+
+-- Politics & Society
+('550e8400-e29b-41d4-a716-446655440081', 'Voting should be mandatory', 'Civic participation strengthens democracy', 'politics', '/placeholder.svg?height=600&width=400&text=Mandatory+Voting', '🗳️'),
+('550e8400-e29b-41d4-a716-446655440082', 'Term limits improve government', 'Fresh perspectives prevent stagnation', 'politics', '/placeholder.svg?height=600&width=400&text=Term+Limits', '⏳'),
+('550e8400-e29b-41d4-a716-446655440083', 'Local politics matter more than national', 'Community decisions affect daily life', 'politics', '/placeholder.svg?height=600&width=400&text=Local+Politics', '🏘️'),
+('550e8400-e29b-41d4-a716-446655440084', 'News media should be publicly funded', 'Independent journalism serves democracy', 'politics', '/placeholder.svg?height=600&width=400&text=Public+Media', '📰'),
+('550e8400-e29b-41d4-a716-446655440085', 'Wealth inequality threatens society', 'Income gaps undermine social stability', 'politics', '/placeholder.svg?height=600&width=400&text=Wealth+Inequality', '⚖️'),
+('550e8400-e29b-41d4-a716-446655440086', 'Immigration strengthens countries', 'Diverse populations drive innovation', 'politics', '/placeholder.svg?height=600&width=400&text=Immigration', '🌍'),
+
+-- Travel & Adventure
+('550e8400-e29b-41d4-a716-446655440087', 'Backpacking builds character', 'Budget travel teaches resourcefulness', 'travel', '/placeholder.svg?height=600&width=400&text=Backpacking', '🎒'),
+('550e8400-e29b-41d4-a716-446655440088', 'Local experiences beat tourist attractions', 'Authentic culture is more rewarding', 'travel', '/placeholder.svg?height=600&width=400&text=Local+Experiences', '🗺️'),
+('550e8400-e29b-41d4-a716-446655440089', 'Slow travel is more meaningful', 'Staying longer creates deeper connections', 'travel', '/placeholder.svg?height=600&width=400&text=Slow+Travel', '🐌'),
+('550e8400-e29b-41d4-a716-446655440090', 'Adventure sports are worth the risk', 'Extreme activities provide life lessons', 'travel', '/placeholder.svg?height=600&width=400&text=Adventure+Sports', '🏔️'),
+('550e8400-e29b-41d4-a716-446655440091', 'Camping is better than hotels', 'Outdoor sleeping connects you with nature', 'travel', '/placeholder.svg?height=600&width=400&text=Camping', '⛺'),
+('550e8400-e29b-41d4-a716-446655440092', 'Group travel is more fun than solo', 'Shared experiences create lasting memories', 'travel', '/placeholder.svg?height=600&width=400&text=Group+Travel', '👥'),
+('550e8400-e29b-41d4-a716-446655440093', 'Road trips beat flying', 'Driving allows spontaneous discoveries', 'travel', '/placeholder.svg?height=600&width=400&text=Road+Trips', '🚗'),
+
+-- Science & Philosophy
+('550e8400-e29b-41d4-a716-446655440094', 'We are not alone in the universe', 'Statistical probability suggests alien life exists', 'science', '/placeholder.svg?height=600&width=400&text=Alien+Life', '👽'),
+('550e8400-e29b-41d4-a716-446655440095', 'Time travel will be possible', 'Physics suggests temporal manipulation is feasible', 'science', '/placeholder.svg?height=600&width=400&text=Time+Travel', '⏰'),
+('550e8400-e29b-41d4-a716-446655440096', 'Free will is an illusion', 'Our choices are determined by prior causes', 'science', '/placeholder.svg?height=600&width=400&text=Free+Will', '🎭'),
+('550e8400-e29b-41d4-a716-446655440097', 'Consciousness can be uploaded', 'Digital minds will achieve immortality', 'science', '/placeholder.svg?height=600&width=400&text=Digital+Consciousness', '🧠'),
+('550e8400-e29b-41d4-a716-446655440098', 'Mathematics is discovered not invented', 'Mathematical truths exist independently', 'science', '/placeholder.svg?height=600&width=400&text=Mathematics', '🔢'),
+('550e8400-e29b-41d4-a716-446655440099', 'Dreams have deeper meaning', 'Sleep visions reveal subconscious truths', 'science', '/placeholder.svg?height=600&width=400&text=Dream+Meaning', '💭'),
+
+-- Sports & Fitness
+('550e8400-e29b-41d4-a716-446655440100', 'Team sports build better character', 'Collaboration teaches valuable life skills', 'sports', '/placeholder.svg?height=600&width=400&text=Team+Sports', '⚽'),
+('550e8400-e29b-41d4-a716-446655440101', 'Swimming is the perfect exercise', 'Full-body workout with low injury risk', 'sports', '/placeholder.svg?height=600&width=400&text=Swimming', '🏊'),
+('550e8400-e29b-41d4-a716-446655440102', 'Yoga improves everything', 'Mind-body practice enhances all aspects of life', 'sports', '/placeholder.svg?height=600&width=400&text=Yoga', '🧘‍♀️'),
+('550e8400-e29b-41d4-a716-446655440103', 'Professional athletes are overpaid', 'Sports salaries are disproportionate to value', 'sports', '/placeholder.svg?height=600&width=400&text=Athlete+Salaries', '💰'),
+('550e8400-e29b-41d4-a716-446655440104', 'Esports are real sports', 'Competitive gaming requires skill and training', 'sports', '/placeholder.svg?height=600&width=400&text=Esports', '🎮'),
+('550e8400-e29b-41d4-a716-446655440105', 'Running barefoot is better', 'Natural foot movement prevents injuries', 'sports', '/placeholder.svg?height=600&width=400&text=Barefoot+Running', '🦶'),
+
+-- More Conversation Starters
+('550e8400-e29b-41d4-a716-446655440106', 'Cereal is acceptable for dinner', 'Simple meals can be satisfying any time', 'conversation', '/placeholder.svg?height=600&width=400&text=Cereal+Dinner', '🥣'),
+('550e8400-e29b-41d4-a716-446655440107', 'Socks with sandals are practical', 'Comfort should override fashion rules', 'conversation', '/placeholder.svg?height=600&width=400&text=Socks+Sandals', '🧦'),
+('550e8400-e29b-41d4-a716-446655440108', 'Puns are the highest form of humor', 'Wordplay demonstrates linguistic creativity', 'conversation', '/placeholder.svg?height=600&width=400&text=Puns', '😄'),
+('550e8400-e29b-41d4-a716-446655440109', 'Pluto should still be a planet', 'Size shouldn''t determine planetary status', 'conversation', '/placeholder.svg?height=600&width=400&text=Pluto+Planet', '🪐'),
+('550e8400-e29b-41d4-a716-446655440110', 'Toilet paper should hang over', 'The correct orientation is front-facing', 'conversation', '/placeholder.svg?height=600&width=400&text=Toilet+Paper', '🧻'),
+('550e8400-e29b-41d4-a716-446655440111', 'Left-handed people are more creative', 'Right-brain dominance enhances imagination', 'conversation', '/placeholder.svg?height=600&width=400&text=Left+Handed', '✋'),
+('550e8400-e29b-41d4-a716-446655440112', 'Odd numbers are more interesting', 'Even numbers lack mathematical personality', 'conversation', '/placeholder.svg?height=600&width=400&text=Odd+Numbers', '1️⃣'),
+('550e8400-e29b-41d4-a716-446655440113', 'Crunchy peanut butter is superior', 'Texture adds to the eating experience', 'conversation', '/placeholder.svg?height=600&width=400&text=Crunchy+Peanut+Butter', '🥜'),
+('550e8400-e29b-41d4-a716-446655440114', 'Winter holidays are too commercialized', 'Authentic celebration gets lost in marketing', 'conversation', '/placeholder.svg?height=600&width=400&text=Holiday+Commercial', '🎄'),
+('550e8400-e29b-41d4-a716-446655440115', 'Parallel parking should be optional', 'Modern cars should eliminate this requirement', 'conversation', '/placeholder.svg?height=600&width=400&text=Parallel+Parking', '🚗')
 
 ON CONFLICT (id) DO NOTHING;
