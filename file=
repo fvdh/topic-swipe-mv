@@ -1,0 +1,91 @@
+scripts/003-create-functions.sql""-- Function to find compatible users with optional location filtering
+CREATE OR REPLACE FUNCTION find_compatible_users(
+    p_user_id UUID,
+    p_max_distance_km DECIMAL DEFAULT 50,
+    p_min_compatibility INTEGER DEFAULT 40,
+    p_limit INTEGER DEFAULT 20
+)
+RETURNS TABLE (
+    user_id UUID,
+    profile JSONB,
+    compatibility_score INTEGER,
+    shared_topics INTEGER,
+    matched_topics INTEGER,
+    conflicting_topics INTEGER,
+    matched_topic_details JSONB
+) AS $$
+DECLARE
+    user_lat DECIMAL;
+    user_lon DECIMAL;
+BEGIN
+    -- Get user's location (optional)
+    SELECT latitude, longitude INTO user_lat, user_lon
+    FROM user_profiles
+    WHERE user_profiles.user_id = p_user_id;
+
+    RETURN QUERY
+    WITH nearby_users AS (
+        SELECT 
+            up.user_id,
+            up.name,
+            up.age,
+            up.bio,
+            up.profile_image_url,
+            up.city,
+            CASE 
+                WHEN up.latitude IS NOT NULL AND up.longitude IS NOT NULL 
+                     AND user_lat IS NOT NULL AND user_lon IS NOT NULL
+                THEN calculate_distance(user_lat, user_lon, up.latitude, up.longitude)
+                ELSE NULL
+            END as distance_km
+        FROM user_profiles up
+        WHERE up.user_id != p_user_id
+        AND up.is_active = true
+        AND (
+            -- Include all users if either user doesn't have location
+            user_lat IS NULL OR user_lon IS NULL OR
+            up.latitude IS NULL OR up.longitude IS NULL OR
+            -- Or include users within distance if both have location
+            calculate_distance(user_lat, user_lon, up.latitude, up.longitude) <= p_max_distance_km
+        )
+    ),
+    compatibility_data AS (
+        SELECT 
+            nu.user_id,
+            nu.name,
+            nu.age,
+            nu.bio,
+            nu.profile_image_url,
+            nu.city,
+            nu.distance_km,
+            COALESCE(cs.score, 0) as compatibility_score,
+            COALESCE(cs.shared_topics, 0) as shared_topics,
+            COALESCE(cs.matched_topics, 0) as matched_topics,
+            COALESCE(cs.conflicting_topics, 0) as conflicting_topics
+        FROM nearby_users nu
+        LEFT JOIN compatibility_scores cs ON (
+            (cs.user1_id = p_user_id AND cs.user2_id = nu.user_id) OR
+            (cs.user1_id = nu.user_id AND cs.user2_id = p_user_id)
+        )
+        WHERE COALESCE(cs.score, 0) >= p_min_compatibility
+    )
+    SELECT 
+        cd.user_id,
+        jsonb_build_object(
+            'name', cd.name,
+            'age', cd.age,
+            'bio', cd.bio,
+            'profile_image_url', cd.profile_image_url,
+            'city', cd.city,
+            'distance_km', cd.distance_km
+        ) as profile,
+        cd.compatibility_score,
+        cd.shared_topics,
+        cd.matched_topics,
+        cd.conflicting_topics,
+        '[]'::jsonb as matched_topic_details
+    FROM compatibility_data cd
+    ORDER BY cd.compatibility_score DESC, COALESCE(cd.distance_km, 999999) ASC
+    LIMIT p_limit;
+END;
+$$ LANGUAGE plpgsql;
