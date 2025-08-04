@@ -13,15 +13,34 @@ interface TopicSyncStatus {
   needsSync: boolean
 }
 
+interface DbTopic {
+  id: string
+  title: string
+  description: string
+  category: string
+  image_url: string
+  icon: string
+  is_active: boolean
+}
+
 export function TopicSync() {
   const [syncStatus, setSyncStatus] = useState<TopicSyncStatus | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [isCleaningUp, setIsCleaningUp] = useState(false)
   const [error, setError] = useState("")
   const [lastSyncTime, setLastSyncTime] = useState<string | null>(null)
+  const [extraTopics, setExtraTopics] = useState<DbTopic[]>([])
+  const [showExtraTopics, setShowExtraTopics] = useState(false)
 
   useEffect(() => {
     checkSyncStatus()
   }, [])
+
+  useEffect(() => {
+    if (syncStatus?.extraInDb.length) {
+      fetchExtraTopics()
+    }
+  }, [syncStatus])
 
   const checkSyncStatus = async () => {
     try {
@@ -83,6 +102,54 @@ export function TopicSync() {
     }
   }
 
+  const fetchExtraTopics = async () => {
+    if (!syncStatus?.extraInDb.length) return
+
+    try {
+      const response = await fetch(`/api/topics?ids=${syncStatus.extraInDb.join(",")}`)
+      const data = await response.json()
+      
+      if (response.ok) {
+        setExtraTopics(data.topics || [])
+      }
+    } catch (error) {
+      console.error("Failed to fetch extra topics:", error)
+    }
+  }
+
+  const cleanupExtraTopics = async () => {
+    if (!syncStatus?.extraInDb.length) return
+
+    try {
+      setIsCleaningUp(true)
+      setError("")
+
+      const response = await fetch("/api/topics/cleanup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          topicIds: syncStatus.extraInDb
+        })
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to cleanup topics")
+      }
+
+      setLastSyncTime(new Date().toLocaleString())
+      await checkSyncStatus() // Refresh status
+    } catch (error: any) {
+      console.error("Topic cleanup error:", error)
+      setError(error.message)
+    } finally {
+      setIsCleaningUp(false)
+    }
+  }
+
   const getSyncStatusColor = () => {
     if (!syncStatus) return "text-gray-600"
     return syncStatus.needsSync ? "text-red-600" : "text-green-600"
@@ -124,10 +191,22 @@ export function TopicSync() {
 
         {syncStatus && (
           <div className="space-y-4">
-            <div className={`text-center p-4 rounded-lg ${syncStatus.needsSync ? "bg-red-50" : "bg-green-50"}`}>
-              <p className={`font-medium ${getSyncStatusColor()}`}>
-                {syncStatus.needsSync ? "Topics need to be synced" : "Topics are in sync"}
+            <div className={`text-center p-4 rounded-lg ${syncStatus.needsSync ? "bg-amber-50 border border-amber-200" : "bg-green-50"}`}>
+              <p className={`font-medium ${syncStatus.needsSync ? "text-amber-800" : getSyncStatusColor()}`}>
+                {syncStatus.needsSync 
+                  ? syncStatus.extraInDb.length > 0 
+                    ? `Database has ${syncStatus.extraInDb.length} extra topics that don't exist in frontend`
+                    : syncStatus.missingInDb.length > 0
+                    ? `Frontend has ${syncStatus.missingInDb.length} topics missing from database`
+                    : "Topics need to be synced"
+                  : "Topics are in sync"
+                }
               </p>
+              {syncStatus.needsSync && syncStatus.extraInDb.length > 0 && (
+                <p className="text-sm text-amber-700 mt-1">
+                  You can remove the extra topics or keep them. The sync won't change this.
+                </p>
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -156,12 +235,56 @@ export function TopicSync() {
 
             {syncStatus.extraInDb.length > 0 && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h4 className="font-semibold text-blue-800 mb-2">Extra in Database ({syncStatus.extraInDb.length})</h4>
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="font-semibold text-blue-800">Extra in Database ({syncStatus.extraInDb.length})</h4>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => setShowExtraTopics(!showExtraTopics)}
+                      className="text-blue-700 border-blue-300"
+                    >
+                      {showExtraTopics ? "Hide" : "Show"} Topics
+                    </Button>
+                    <Button 
+                      variant="destructive" 
+                      size="sm"
+                      onClick={cleanupExtraTopics}
+                      disabled={isCleaningUp}
+                      className="bg-red-600 hover:bg-red-700"
+                    >
+                      {isCleaningUp ? (
+                        <>
+                          <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                          Cleaning...
+                        </>
+                      ) : (
+                        "Remove Extra"
+                      )}
+                    </Button>
+                  </div>
+                </div>
                 <div className="text-sm text-blue-700">
                   {syncStatus.extraInDb.length > 5
                     ? `${syncStatus.extraInDb.slice(0, 5).join(", ")} and ${syncStatus.extraInDb.length - 5} more...`
                     : syncStatus.extraInDb.join(", ")}
                 </div>
+                
+                {showExtraTopics && extraTopics.length > 0 && (
+                  <div className="mt-3 space-y-2 max-h-60 overflow-y-auto">
+                    {extraTopics.map((topic) => (
+                      <div key={topic.id} className="bg-white rounded p-2 border border-blue-200">
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg">{topic.icon}</span>
+                          <div className="flex-1">
+                            <div className="font-medium text-sm">{topic.title}</div>
+                            <div className="text-xs text-gray-600">{topic.category}</div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -199,11 +322,15 @@ export function TopicSync() {
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <h4 className="font-semibold text-blue-800 mb-2">What does sync do?</h4>
           <ul className="text-sm text-blue-700 space-y-1">
-            <li>• Ensures all frontend topics exist in the database</li>
-            <li>• Updates existing topics with latest data</li>
+            <li>• Ensures all frontend topics (35) exist in the database</li>
+            <li>• Updates existing topics with latest frontend data</li>
+            <li>• Does NOT remove extra topics from database</li>
             <li>• Fixes foreign key constraint errors when saving preferences</li>
             <li>• Required before users can swipe and save preferences</li>
           </ul>
+          <div className="mt-2 p-2 bg-amber-100 rounded text-amber-800 text-xs">
+            <strong>Note:</strong> Sync only adds/updates frontend topics. Use "Remove Extra" to clean up database-only topics.
+          </div>
         </div>
 
         {error && error.includes("environment variable") && (
