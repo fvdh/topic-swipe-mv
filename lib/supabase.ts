@@ -31,12 +31,17 @@ export function getSupabaseClient() {
       throw new Error("Missing NEXT_PUBLIC_SUPABASE_ANON_KEY environment variable")
     }
 
-    supabaseClient = createClient(supabaseUrl!, supabaseAnonKey!, {
-      auth: {
-        persistSession: true,
-        autoRefreshToken: true,
-      },
-    })
+    try {
+      supabaseClient = createClient(supabaseUrl!, supabaseAnonKey!, {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+        },
+      })
+    } catch (error) {
+      console.error("Failed to create Supabase client:", error)
+      throw error
+    }
   }
 
   return supabaseClient
@@ -57,12 +62,17 @@ export function getAdminClient() {
       throw new Error("Missing SUPABASE_SERVICE_ROLE_KEY environment variable")
     }
 
-    adminClient = createClient(supabaseUrl!, supabaseServiceKey!, {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false,
-      },
-    })
+    try {
+      adminClient = createClient(supabaseUrl!, supabaseServiceKey!, {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false,
+        },
+      })
+    } catch (error) {
+      console.error("Failed to create admin client:", error)
+      throw error
+    }
   }
 
   return adminClient
@@ -94,21 +104,9 @@ export function getAdminClientSafe() {
   }
 }
 
-// Legacy exports - only initialize if environment is available
-export const supabase = (() => {
-  try {
-    return getSupabaseClient()
-  } catch (error) {
-    console.warn("Supabase client not available:", error)
-    return null
-  }
-})()
+// Main exports - use safe initialization
+export const supabase = getSupabaseClientSafe()
+export const supabaseAdmin = getAdminClientSafe()
 
-export const supabaseAdmin = (() => {
-  try {
-    return getAdminClient()
-  } catch (error) {
-    console.warn("Supabase admin client not available:", error)
-    return null
-  }
-})()
+// Export the getter functions as well
+export { getSupabaseClient as createSupabaseClient, getAdminClient as createAdminClient }
