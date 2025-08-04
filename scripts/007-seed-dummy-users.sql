@@ -1,6 +1,9 @@
 -- Seed script for dummy users and preferences
 
 -- First, ensure we have some test user profiles
+-- Add unique constraint if it doesn't exist
+ALTER TABLE user_profiles ADD CONSTRAINT IF NOT EXISTS unique_user_profiles_user_id UNIQUE (user_id);
+
 INSERT INTO user_profiles (user_id, name, age, bio, city, country, latitude, longitude, max_distance_preference, share_location, last_active)
 VALUES 
   ('550e8400-e29b-41d4-a716-446655440201', 'Alex Johnson', 25, 'Love traveling and coffee!', 'Amsterdam', 'Netherlands', 52.3676, 4.9041, 50, true, NOW()),

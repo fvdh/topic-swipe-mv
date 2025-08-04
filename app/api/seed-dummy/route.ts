@@ -105,16 +105,39 @@ export async function POST(request: NextRequest) {
           max_distance_preference: user.max_distance_preference,
           share_location: user.share_location,
           last_active: new Date().toISOString()
+        }, { 
+          onConflict: 'user_id',
+          ignoreDuplicates: false 
         })
         .select();
 
       if (profileError) {
-        results.push({ 
-          user: user.name, 
-          profile: false, 
-          error: profileError.message 
-        });
-        continue;
+        // Try insert without upsert if upsert fails
+        const { data: insertProfile, error: insertError } = await supabase
+          .from('user_profiles')
+          .insert({
+            user_id: user.user_id,
+            name: user.name,
+            age: user.age,
+            bio: user.bio,
+            city: user.city,
+            country: user.country,
+            latitude: user.latitude,
+            longitude: user.longitude,
+            max_distance_preference: user.max_distance_preference,
+            share_location: user.share_location,
+            last_active: new Date().toISOString()
+          })
+          .select();
+
+        if (insertError && !insertError.message.includes('duplicate')) {
+          results.push({ 
+            user: user.name, 
+            profile: false, 
+            error: insertError.message 
+          });
+          continue;
+        }
       }
 
       // Add topic preferences for this user
