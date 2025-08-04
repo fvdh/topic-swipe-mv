@@ -1,112 +1,45 @@
 import { createClient } from "@supabase/supabase-js"
 
-// Environment variable validation with better error handling
-function validateEnvironment() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+// Environment variable validation
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
-  return {
-    supabaseUrl,
-    supabaseAnonKey,
-    supabaseServiceKey,
-    hasUrl: !!supabaseUrl,
-    hasAnonKey: !!supabaseAnonKey,
-    hasServiceKey: !!supabaseServiceKey,
-  }
+if (!supabaseUrl) {
+  throw new Error("Missing NEXT_PUBLIC_SUPABASE_URL environment variable")
 }
 
-// Client-side Supabase client (lazy initialization)
-let supabaseClient: ReturnType<typeof createClient> | null = null
-
-export function getSupabaseClient() {
-  if (!supabaseClient) {
-    const { supabaseUrl, supabaseAnonKey, hasUrl, hasAnonKey } = validateEnvironment()
-
-    if (!hasUrl) {
-      throw new Error("Missing NEXT_PUBLIC_SUPABASE_URL environment variable")
-    }
-
-    if (!hasAnonKey) {
-      throw new Error("Missing NEXT_PUBLIC_SUPABASE_ANON_KEY environment variable")
-    }
-
-    try {
-      supabaseClient = createClient(supabaseUrl!, supabaseAnonKey!, {
-        auth: {
-          persistSession: true,
-          autoRefreshToken: true,
-        },
-      })
-    } catch (error) {
-      console.error("Failed to create Supabase client:", error)
-      throw error
-    }
-  }
-
-  return supabaseClient
+if (!supabaseAnonKey) {
+  throw new Error("Missing NEXT_PUBLIC_SUPABASE_ANON_KEY environment variable")
 }
 
-// Server-side admin client (lazy initialization)
-let adminClient: ReturnType<typeof createClient> | null = null
+// Create the main Supabase client (client-side)
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+  },
+})
 
-export function getAdminClient() {
-  if (!adminClient) {
-    const { supabaseUrl, supabaseServiceKey, hasUrl, hasServiceKey } = validateEnvironment()
-
-    if (!hasUrl) {
-      throw new Error("Missing NEXT_PUBLIC_SUPABASE_URL environment variable")
-    }
-
-    if (!hasServiceKey) {
-      throw new Error("Missing SUPABASE_SERVICE_ROLE_KEY environment variable")
-    }
-
-    try {
-      adminClient = createClient(supabaseUrl!, supabaseServiceKey!, {
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false,
-        },
-      })
-    } catch (error) {
-      console.error("Failed to create admin client:", error)
-      throw error
-    }
-  }
-
-  return adminClient
-}
+// Create admin client (server-side only) - gracefully handle missing service key
+export const supabaseAdmin = supabaseServiceKey
+  ? createClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
+    })
+  : null
 
 // Helper function to check if admin client is available
 export function isAdminAvailable(): boolean {
-  const { hasUrl, hasServiceKey } = validateEnvironment()
-  return hasUrl && hasServiceKey
+  return supabaseAdmin !== null
 }
 
-// Safe client getter that doesn't throw
-export function getSupabaseClientSafe() {
-  try {
-    return getSupabaseClient()
-  } catch (error) {
-    console.error("Failed to create Supabase client:", error)
-    return null
+// Helper function to get admin client with error handling
+export function getAdminClient() {
+  if (!supabaseAdmin) {
+    throw new Error("Admin client not available. Please set SUPABASE_SERVICE_ROLE_KEY environment variable.")
   }
+  return supabaseAdmin
 }
-
-// Safe admin getter that doesn't throw
-export function getAdminClientSafe() {
-  try {
-    return getAdminClient()
-  } catch (error) {
-    console.error("Failed to create admin client:", error)
-    return null
-  }
-}
-
-// Main exports - use safe initialization
-export const supabase = getSupabaseClientSafe()
-export const supabaseAdmin = getAdminClientSafe()
-
-// Export the getter functions as well
-export { getSupabaseClient as createSupabaseClient, getAdminClient as createAdminClient }

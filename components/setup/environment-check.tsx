@@ -1,135 +1,92 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Badge } from "@/components/ui/badge"
-import { CheckCircle, AlertCircle, XCircle, Loader2 } from "lucide-react"
+import { useEffect, useState } from "react"
+import { AlertCircle, CheckCircle, Loader2 } from "lucide-react"
 
-interface EnvStatus {
-  name: string
-  present: boolean
-  value?: string
-  masked?: boolean
+interface EnvironmentStatus {
+  hasUrl: boolean
+  hasAnonKey: boolean
+  hasServiceKey: boolean
+  isLoading: boolean
 }
 
 export function EnvironmentCheck() {
-  const [envStatus, setEnvStatus] = useState<EnvStatus[]>([])
-  const [loading, setLoading] = useState(true)
+  const [status, setStatus] = useState<EnvironmentStatus>({
+    hasUrl: false,
+    hasAnonKey: false,
+    hasServiceKey: false,
+    isLoading: true,
+  })
 
   useEffect(() => {
-    const checkEnvironment = () => {
-      const requiredEnvs = [
-        {
-          name: "NEXT_PUBLIC_SUPABASE_URL",
-          value: process.env.NEXT_PUBLIC_SUPABASE_URL,
-        },
-        {
-          name: "NEXT_PUBLIC_SUPABASE_ANON_KEY",
-          value: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-          masked: true,
-        },
-        {
-          name: "SUPABASE_SERVICE_ROLE_KEY",
-          value: process.env.SUPABASE_SERVICE_ROLE_KEY,
-          masked: true,
-        },
-      ]
+    // Check environment variables
+    const hasUrl = !!process.env.NEXT_PUBLIC_SUPABASE_URL
+    const hasAnonKey = !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    const hasServiceKey = !!process.env.SUPABASE_SERVICE_ROLE_KEY
 
-      const status = requiredEnvs.map((env) => ({
-        name: env.name,
-        present: !!env.value,
-        value: env.value,
-        masked: env.masked,
-      }))
-
-      setEnvStatus(status)
-      setLoading(false)
-    }
-
-    checkEnvironment()
+    setStatus({
+      hasUrl,
+      hasAnonKey,
+      hasServiceKey,
+      isLoading: false,
+    })
   }, [])
 
-  const allPresent = envStatus.every((env) => env.present)
-  const missingCount = envStatus.filter((env) => !env.present).length
-
-  if (loading) {
+  if (status.isLoading) {
     return (
-      <Card>
-        <CardContent className="flex items-center justify-center p-8">
-          <Loader2 className="w-6 h-6 animate-spin text-blue-600 mr-3" />
-          <span>Checking environment variables...</span>
-        </CardContent>
-      </Card>
+      <div className="flex items-center gap-2 text-blue-600">
+        <Loader2 className="w-4 h-4 animate-spin" />
+        <span className="text-sm">Checking environment...</span>
+      </div>
     )
   }
 
+  const allRequired = status.hasUrl && status.hasAnonKey
+  const allOptional = allRequired && status.hasServiceKey
+
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="flex items-center gap-2">
-              Environment Status
-              {allPresent ? (
-                <CheckCircle className="w-5 h-5 text-green-600" />
-              ) : (
-                <AlertCircle className="w-5 h-5 text-red-600" />
-              )}
-            </CardTitle>
-            <CardDescription>
-              {allPresent
-                ? "All required environment variables are configured"
-                : `${missingCount} environment variable${missingCount > 1 ? "s" : ""} missing`}
-            </CardDescription>
-          </div>
-          <Badge variant={allPresent ? "default" : "destructive"}>
-            {envStatus.filter((env) => env.present).length}/{envStatus.length}
-          </Badge>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {!allPresent && (
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              Missing environment variables detected. Please configure them in your <code>.env.local</code> file.
-            </AlertDescription>
-          </Alert>
+    <div className="space-y-2">
+      <div className="flex items-center gap-2">
+        {allOptional ? (
+          <CheckCircle className="w-4 h-4 text-green-600" />
+        ) : allRequired ? (
+          <CheckCircle className="w-4 h-4 text-orange-600" />
+        ) : (
+          <AlertCircle className="w-4 h-4 text-red-600" />
         )}
+        <span className="text-sm font-medium">
+          {allOptional && "All environment variables configured"}
+          {allRequired && !allOptional && "Required variables configured"}
+          {!allRequired && "Environment variables missing"}
+        </span>
+      </div>
 
-        <div className="space-y-3">
-          {envStatus.map((env) => (
-            <div key={env.name} className="flex items-center justify-between p-3 border rounded-lg">
-              <div className="flex items-center gap-3">
-                {env.present ? (
-                  <CheckCircle className="w-5 h-5 text-green-600" />
-                ) : (
-                  <XCircle className="w-5 h-5 text-red-600" />
-                )}
-                <div>
-                  <div className="font-medium">{env.name}</div>
-                  {env.present && env.value && (
-                    <div className="text-sm text-gray-500 font-mono">
-                      {env.masked ? `${env.value.substring(0, 20)}...` : env.value}
-                    </div>
-                  )}
-                </div>
-              </div>
-              <Badge variant={env.present ? "default" : "destructive"}>{env.present ? "Present" : "Missing"}</Badge>
-            </div>
-          ))}
+      <div className="text-xs text-gray-600 space-y-1">
+        <div className="flex items-center gap-2">
+          {status.hasUrl ? (
+            <CheckCircle className="w-3 h-3 text-green-600" />
+          ) : (
+            <AlertCircle className="w-3 h-3 text-red-600" />
+          )}
+          <span>NEXT_PUBLIC_SUPABASE_URL</span>
         </div>
-
-        {allPresent && (
-          <Alert>
-            <CheckCircle className="h-4 w-4" />
-            <AlertDescription>
-              <strong>Environment Ready:</strong> All required environment variables are properly configured.
-            </AlertDescription>
-          </Alert>
-        )}
-      </CardContent>
-    </Card>
+        <div className="flex items-center gap-2">
+          {status.hasAnonKey ? (
+            <CheckCircle className="w-3 h-3 text-green-600" />
+          ) : (
+            <AlertCircle className="w-3 h-3 text-red-600" />
+          )}
+          <span>NEXT_PUBLIC_SUPABASE_ANON_KEY</span>
+        </div>
+        <div className="flex items-center gap-2">
+          {status.hasServiceKey ? (
+            <CheckCircle className="w-3 h-3 text-green-600" />
+          ) : (
+            <AlertCircle className="w-3 h-3 text-orange-600" />
+          )}
+          <span>SUPABASE_SERVICE_ROLE_KEY (optional)</span>
+        </div>
+      </div>
+    </div>
   )
 }

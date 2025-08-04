@@ -45,22 +45,15 @@ export default function TopicSwipeApp() {
   const [showMatches, setShowMatches] = useState(false)
   const [databaseReady, setDatabaseReady] = useState<boolean | null>(null)
   const [topicsReady, setTopicsReady] = useState<boolean | null>(null)
-  const [setupError, setSetupError] = useState<string | null>(null)
 
   useEffect(() => {
-    // Check if user is already logged in
+    // Check if user is already logged in (you might want to use localStorage or cookies)
     const savedUser = localStorage.getItem("user")
     const savedProfile = localStorage.getItem("profile")
 
     if (savedUser && savedProfile) {
-      try {
-        setUser(JSON.parse(savedUser))
-        setProfile(JSON.parse(savedProfile))
-      } catch (error) {
-        console.error("Error parsing saved user data:", error)
-        localStorage.removeItem("user")
-        localStorage.removeItem("profile")
-      }
+      setUser(JSON.parse(savedUser))
+      setProfile(JSON.parse(savedProfile))
     }
   }, [])
 
@@ -68,79 +61,27 @@ export default function TopicSwipeApp() {
     // Test database connection and topic sync on app load
     const testDatabase = async () => {
       try {
-        console.log("Testing database connection...")
-
-        // First check if basic environment variables are present
-        const hasBasicEnv = process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-        if (!hasBasicEnv) {
-          console.log("Basic environment variables missing")
+        // First check if environment variables are present
+        if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
           setDatabaseReady(false)
           setTopicsReady(false)
-          setSetupError("Environment variables not configured")
           return
         }
 
         const dbResponse = await fetch("/api/test-db")
-
-        if (!dbResponse.ok) {
-          const errorText = await dbResponse.text()
-          console.error("Database test failed with status:", dbResponse.status)
-          console.error("Error response:", errorText)
-
-          try {
-            const errorData = JSON.parse(errorText)
-            setSetupError(errorData.details || errorData.error || "Database connection failed")
-          } catch (parseError) {
-            setSetupError(`Database connection failed: ${dbResponse.status}`)
-          }
-
-          setDatabaseReady(false)
-          setTopicsReady(false)
-          return
-        }
-
-        let dbData
-        try {
-          dbData = await dbResponse.json()
-          console.log("Database test response:", dbData)
-        } catch (parseError) {
-          console.error("Failed to parse database response:", parseError)
-          setDatabaseReady(false)
-          setTopicsReady(false)
-          setSetupError("Invalid response from database API")
-          return
-        }
-
-        const dbReady = dbData.ready === true
+        const dbReady = dbResponse.ok
         setDatabaseReady(dbReady)
 
         if (dbReady) {
           // Also check if topics are synced
-          try {
-            console.log("Checking topic sync...")
-            const topicResponse = await fetch("/api/topics/sync")
-            if (topicResponse.ok) {
-              const topicData = await topicResponse.json()
-              const topicsReady = topicResponse.ok && !topicData.needsSync
-              setTopicsReady(topicsReady)
-              console.log("Topics ready:", topicsReady)
-            } else {
-              console.log("Topic sync check failed")
-              setTopicsReady(false)
-            }
-          } catch (topicError) {
-            console.error("Topic sync check failed:", topicError)
-            setTopicsReady(false)
-          }
-        } else {
-          setSetupError(dbData.details || dbData.error || "Database not ready")
+          const topicResponse = await fetch("/api/topics/sync")
+          const topicData = await topicResponse.json()
+          setTopicsReady(topicResponse.ok && !topicData.needsSync)
         }
       } catch (error) {
         console.error("Database test error:", error)
         setDatabaseReady(false)
         setTopicsReady(false)
-        setSetupError("Failed to connect to database")
       }
     }
 
@@ -259,7 +200,6 @@ export default function TopicSwipeApp() {
     setSwipeResults([])
   }
 
-  // Show database setup if not ready
   if (databaseReady === false || topicsReady === false) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center p-4">
@@ -268,7 +208,6 @@ export default function TopicSwipeApp() {
     )
   }
 
-  // Show loading while checking
   if (databaseReady === null || topicsReady === null) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center p-4">
@@ -277,7 +216,6 @@ export default function TopicSwipeApp() {
           <p className="text-gray-600">
             {databaseReady === null ? "Checking database connection..." : "Verifying topics..."}
           </p>
-          {setupError && <p className="text-red-600 text-sm mt-2">{setupError}</p>}
         </div>
       </div>
     )

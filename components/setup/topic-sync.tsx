@@ -1,36 +1,53 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Progress } from "@/components/ui/progress"
-import { Badge } from "@/components/ui/badge"
-import { CheckCircle, AlertCircle, Loader2, RefreshCw, Database } from "lucide-react"
+import { AlertCircle, CheckCircle, FolderSyncIcon as Sync, Loader2, Database } from "lucide-react"
 
 interface TopicSyncStatus {
-  success: boolean
-  message: string
-  details?: string
-  topics_synced?: number
-  categories?: Record<string, number>
+  mockTopics: number
+  dbTopics: number
+  missingInDb: string[]
+  extraInDb: string[]
+  needsSync: boolean
 }
 
 export function TopicSync() {
   const [syncStatus, setSyncStatus] = useState<TopicSyncStatus | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [progress, setProgress] = useState(0)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState("")
+  const [lastSyncTime, setLastSyncTime] = useState<string | null>(null)
+
+  useEffect(() => {
+    checkSyncStatus()
+  }, [])
+
+  const checkSyncStatus = async () => {
+    try {
+      setIsLoading(true)
+      setError("")
+
+      const response = await fetch("/api/topics/sync")
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to check sync status")
+      }
+
+      setSyncStatus(data)
+    } catch (error: any) {
+      console.error("Sync status check error:", error)
+      setError(error.message)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const syncTopics = async () => {
-    setLoading(true)
-    setProgress(0)
-    setSyncStatus(null)
-
     try {
-      // Simulate progress updates
-      const progressInterval = setInterval(() => {
-        setProgress((prev) => Math.min(prev + 10, 90))
-      }, 200)
+      setIsLoading(true)
+      setError("")
 
       const response = await fetch("/api/topics/sync", {
         method: "POST",
@@ -39,153 +56,145 @@ export function TopicSync() {
         },
       })
 
-      clearInterval(progressInterval)
-      setProgress(100)
-
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || "Topic sync failed")
+        throw new Error(data.error || "Failed to sync topics")
       }
 
-      setSyncStatus(data)
+      setLastSyncTime(new Date().toLocaleString())
+      await checkSyncStatus() // Refresh status
     } catch (error: any) {
       console.error("Topic sync error:", error)
-      setSyncStatus({
-        success: false,
-        message: "Topic sync failed",
-        details: error.message,
-      })
+      setError(error.message)
     } finally {
-      setLoading(false)
+      setIsLoading(false)
     }
   }
 
-  const checkTopics = async () => {
-    setLoading(true)
-    try {
-      const response = await fetch("/api/topics")
-      const data = await response.json()
+  const getSyncStatusColor = () => {
+    if (!syncStatus) return "text-gray-600"
+    return syncStatus.needsSync ? "text-red-600" : "text-green-600"
+  }
 
-      if (response.ok && data.topics) {
-        const categories = data.topics.reduce((acc: Record<string, number>, topic: any) => {
-          acc[topic.category] = (acc[topic.category] || 0) + 1
-          return acc
-        }, {})
-
-        setSyncStatus({
-          success: true,
-          message: "Topics loaded successfully",
-          topics_synced: data.topics.length,
-          categories,
-        })
-      } else {
-        setSyncStatus({
-          success: false,
-          message: "Failed to load topics",
-          details: data.error || "Unknown error",
-        })
-      }
-    } catch (error: any) {
-      setSyncStatus({
-        success: false,
-        message: "Failed to check topics",
-        details: error.message,
-      })
-    } finally {
-      setLoading(false)
-    }
+  const getSyncStatusIcon = () => {
+    if (isLoading) return <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
+    if (!syncStatus) return <Database className="w-6 h-6 text-gray-600" />
+    return syncStatus.needsSync ? (
+      <AlertCircle className="w-6 h-6 text-red-600" />
+    ) : (
+      <CheckCircle className="w-6 h-6 text-green-600" />
+    )
   }
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <Database className="w-6 h-6 text-blue-600" />
-            <div>
-              <CardTitle>Topic Synchronization</CardTitle>
-              <CardDescription>Sync conversation topics with your database</CardDescription>
-            </div>
+    <Card className="w-full max-w-2xl mx-auto">
+      <CardHeader>
+        <div className="flex items-center gap-3">
+          {getSyncStatusIcon()}
+          <div>
+            <CardTitle>Topic Database Sync</CardTitle>
+            <CardDescription>Ensure topics are properly synced between frontend and database</CardDescription>
           </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <h4 className="font-semibold text-blue-800 mb-2">What this does:</h4>
-            <ul className="text-sm text-blue-700 list-disc list-inside space-y-1">
-              <li>Syncs 35 conversation topics across 5 categories</li>
-              <li>Ensures topic IDs match between frontend and database</li>
-              <li>Creates topics for: Conversation, Technology, Lifestyle, Health, Nature</li>
-              <li>Safe to run multiple times (won't create duplicates)</li>
-            </ul>
-          </div>
-
-          {loading && (
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span className="text-sm">{progress < 100 ? "Syncing topics..." : "Finalizing sync..."}</span>
-              </div>
-              <Progress value={progress} className="w-full" />
-            </div>
-          )}
-
-          {syncStatus && (
-            <Alert variant={syncStatus.success ? "default" : "destructive"}>
-              {syncStatus.success ? <CheckCircle className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
-              <AlertDescription>
-                <strong>{syncStatus.message}</strong>
-                {syncStatus.details && (
-                  <>
-                    <br />
-                    <span className="text-sm">{syncStatus.details}</span>
-                  </>
-                )}
-                {syncStatus.topics_synced && (
-                  <>
-                    <br />
-                    <span className="text-sm">Topics synced: {syncStatus.topics_synced}</span>
-                  </>
-                )}
-              </AlertDescription>
-            </Alert>
-          )}
-
-          {syncStatus?.categories && (
-            <div className="space-y-3">
-              <h4 className="font-semibold">Topics by Category</h4>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                {Object.entries(syncStatus.categories).map(([category, count]) => (
-                  <div key={category} className="flex items-center justify-between p-2 border rounded">
-                    <span className="capitalize text-sm">{category}</span>
-                    <Badge variant="outline">{count}</Badge>
-                  </div>
-                ))}
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+            <div className="flex items-start gap-2">
+              <AlertCircle className="w-5 h-5 text-red-600 mt-0.5" />
+              <div>
+                <h3 className="font-semibold text-red-800">Sync Error</h3>
+                <p className="text-sm text-red-700 mt-1">{error}</p>
               </div>
             </div>
-          )}
-
-          <div className="flex gap-2">
-            <Button onClick={syncTopics} disabled={loading} className="flex-1">
-              {loading ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Syncing...
-                </>
-              ) : (
-                <>
-                  <Database className="w-4 h-4 mr-2" />
-                  Sync Topics
-                </>
-              )}
-            </Button>
-            <Button onClick={checkTopics} variant="outline" disabled={loading}>
-              <RefreshCw className="w-4 h-4 mr-2" />
-              Check Status
-            </Button>
           </div>
-        </CardContent>
-      </Card>
-    </div>
+        )}
+
+        {syncStatus && (
+          <div className="space-y-4">
+            <div className={`text-center p-4 rounded-lg ${syncStatus.needsSync ? "bg-red-50" : "bg-green-50"}`}>
+              <p className={`font-medium ${getSyncStatusColor()}`}>
+                {syncStatus.needsSync ? "Topics need to be synced" : "Topics are in sync"}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-blue-50 rounded-lg p-4 text-center">
+                <div className="text-2xl font-bold text-blue-600">{syncStatus.mockTopics}</div>
+                <div className="text-sm text-blue-700">Frontend Topics</div>
+              </div>
+              <div className="bg-purple-50 rounded-lg p-4 text-center">
+                <div className="text-2xl font-bold text-purple-600">{syncStatus.dbTopics}</div>
+                <div className="text-sm text-purple-700">Database Topics</div>
+              </div>
+            </div>
+
+            {syncStatus.missingInDb.length > 0 && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <h4 className="font-semibold text-yellow-800 mb-2">
+                  Missing in Database ({syncStatus.missingInDb.length})
+                </h4>
+                <div className="text-sm text-yellow-700">
+                  {syncStatus.missingInDb.length > 5
+                    ? `${syncStatus.missingInDb.slice(0, 5).join(", ")} and ${syncStatus.missingInDb.length - 5} more...`
+                    : syncStatus.missingInDb.join(", ")}
+                </div>
+              </div>
+            )}
+
+            {syncStatus.extraInDb.length > 0 && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h4 className="font-semibold text-blue-800 mb-2">Extra in Database ({syncStatus.extraInDb.length})</h4>
+                <div className="text-sm text-blue-700">
+                  {syncStatus.extraInDb.length > 5
+                    ? `${syncStatus.extraInDb.slice(0, 5).join(", ")} and ${syncStatus.extraInDb.length - 5} more...`
+                    : syncStatus.extraInDb.join(", ")}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {lastSyncTime && <div className="text-center text-sm text-gray-500">Last synced: {lastSyncTime}</div>}
+
+        <div className="flex gap-3">
+          <Button onClick={checkSyncStatus} variant="outline" disabled={isLoading} className="flex-1 bg-transparent">
+            {isLoading ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Checking...
+              </>
+            ) : (
+              "Check Status"
+            )}
+          </Button>
+
+          <Button onClick={syncTopics} disabled={isLoading} className="flex-1">
+            {isLoading ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Syncing...
+              </>
+            ) : (
+              <>
+                <Sync className="w-4 h-4 mr-2" />
+                Sync Topics
+              </>
+            )}
+          </Button>
+        </div>
+
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <h4 className="font-semibold text-blue-800 mb-2">What does sync do?</h4>
+          <ul className="text-sm text-blue-700 space-y-1">
+            <li>• Ensures all frontend topics exist in the database</li>
+            <li>• Updates existing topics with latest data</li>
+            <li>• Fixes foreign key constraint errors when saving preferences</li>
+            <li>• Required before users can swipe and save preferences</li>
+          </ul>
+        </div>
+      </CardContent>
+    </Card>
   )
 }
