@@ -22,12 +22,12 @@ export async function GET(request: NextRequest) {
 
     console.log("Admin client created successfully")
 
-    // Test basic connection
+    // Test basic connection by checking if we can access our tables
     try {
+      // Try to access one of our known tables to test the connection
       const { data: connectionTest, error: connectionError } = await supabase
-        .from("information_schema.tables")
-        .select("table_name")
-        .limit(1)
+        .from("topics")
+        .select("count", { count: 'exact', head: true })
 
       if (connectionError) {
         console.error("Connection test failed:", connectionError)
